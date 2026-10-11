@@ -1,13 +1,7 @@
-# This workflow validates, deploys, and runs the specified bundle
-# within a production target named "prod".
-name: 'Production deployment'
+name: Production deployment
 
-# Ensure that only a single job or workflow using the same concurrency group
-# runs at a time.
 concurrency: 1
-#
-# Trigger this workflow whenever a pull request is pushed to the repo's
-# main branch.
+
 on:
   push:
     branches:
@@ -17,29 +11,39 @@ on:
 
 jobs:
   deploy:
-    name: 'Deploy bundle'
+    name: Deploy bundle
     runs-on: ubuntu-latest
 
     steps:
-      # Check out this repo, so that this workflow can access it.
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Explore repository directories
         run: |
           pwd
           ls -la
           find . -maxdepth 5 -name databricks.yml -print
 
-      # Download the Databricks CLI.
-      #
-      # See https://github.com/databricks/setup-cli
-      - uses: databricks/setup-cli@main
-      - name: Deploy bundle
-        run: databricks bundle deploy -t prod
-        working-directory: bakehouse_analytics
-       
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
 
-     
+      - name: Verify Databricks authentication
+        working-directory: bakehouse_analytics
+        run: databricks current-user me
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}
-          DATABRICKS_BUNDLE_ENV: prod
+
+      - name: Validate bundle
+        working-directory: bakehouse_analytics
+        run: databricks bundle validate -t prod
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}
+
+      - name: Deploy bundle
+        working-directory: bakehouse_analytics
+        run: databricks bundle deploy -t prod
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}

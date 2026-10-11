@@ -34,8 +34,9 @@ jobs:
       # See https://github.com/databricks/setup-cli
       - uses: databricks/setup-cli@main
       - name: Deploy bundle
-        run: databricks bundle deploy
+        run: databricks bundle deploy -t prod
         working-directory: bakehouse_analytics
+       
 
      
         env:

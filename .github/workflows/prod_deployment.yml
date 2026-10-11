@@ -14,6 +14,10 @@ jobs:
     name: Deploy bundle
     runs-on: ubuntu-latest
 
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,20 +34,11 @@ jobs:
       - name: Verify Databricks authentication
         working-directory: bakehouse_analytics
         run: databricks current-user me
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}
 
       - name: Validate bundle
         working-directory: bakehouse_analytics
         run: databricks bundle validate -t prod
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}
 
       - name: Deploy bundle
         working-directory: bakehouse_analytics
         run: databricks bundle deploy -t prod
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}

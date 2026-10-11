@@ -30,8 +30,9 @@ jobs:
 
       # Deploy the bundle to the "prod" target as defined
       # in the bundle's settings file.
-      - run: databricks bundle deploy
+      - name: Deploy bundle to prod
+        run: databricks bundle deploy --target prod
         working-directory: bakehouse_analytics
         env:
+          DATABRICKS_HOST: https://dbc-61a5b162-67e1.cloud.databricks.com
           DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}
-          DATABRICKS_BUNDLE_ENV: prod
